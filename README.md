@@ -24,7 +24,7 @@ To use google maps in an android app you can use *SupportMapFragment* atau *MapV
 
 ***
 ### Getting API Key
-- Go to the google cloud console page and click credentials submenu
+- Go to the google cloud console page and click credentials submenu (or [Get API Key](https://developers.google.com/maps/documentation/android-api/signup) )
 
 ![](images/ga_1.png)
 
