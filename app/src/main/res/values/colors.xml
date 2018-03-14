@@ -8,4 +8,6 @@
     <color name="appNameText">#414345</color>
     <color name="subText">#838484</color>
     <color name="subSubText">#989999</color>
+
+    <color name="ic_launcher_background">#F2F2F2</color>
 </resources>
