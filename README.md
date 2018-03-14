@@ -9,13 +9,13 @@ To use google maps in an android app you can use *SupportMapFragment* atau *MapV
 
 - Using google maps fragment (inside a layout or as a root tag)
  
-~~~
+```xml
 <fragment
 	android:id="@+id/map"
 	android:name="com.google.android.gms.maps.SupportMapFragment"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"/>
-~~~
+```
 
 - Then you have to add permissions and google maps api key in the *AndroidManifest.xml* file
 
@@ -34,21 +34,21 @@ To use google maps in an android app you can use *SupportMapFragment* atau *MapV
 ![](images/ga_2.png)
 
 
-- New API key has been created to restrict access click the restrict button (batasi kunci)
+- New API key has been created, you can copy the key and paste in the manifest file. To restrict access of the key click the restrict button
 
 ![](images/ga_3.png)
 
 
-- You can restrict key usage by selecting the platform or IP adress by which the api call would be requested (Application restrictions)
+- You can restrict api key usage by selecting the platform or IP address by which the api call would be requested (Application restrictions)
 
 ![](images/ga_4.png)
 
-> 1.. Select one of the application restrictions radio button (in this case Android)
-> 2. Insert your android app package name
-> 3. Insert SHA-1 fingerprint of your app
-> 4. Click Save button
+1. Select one of the application restrictions (in this case Android)
+2. Insert your android app package name
+3. Insert SHA-1 fingerprint of your app
+4. Click Save button
 
 ___
->To get SHA-1 key you can use your android studo by opening your particular project -> select signingReport gradle task -> copy & paste into the form
+> - To get SHA-1 key you can use your android studo by opening your particular project -> select signingReport gradle task -> copy & paste the SHA-1 key into the android app restriction form
 
 ![](images/as_2.png)
