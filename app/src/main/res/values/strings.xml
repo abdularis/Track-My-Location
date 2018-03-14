@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Track My Location</string>
+    <string name="app_desc">Track other\'s phone location with simple</string>
+    <string name="sign_in_desc">Please sign in or register new account</string>
+</resources>
