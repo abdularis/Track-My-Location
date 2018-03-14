@@ -4,6 +4,19 @@ This is a simple android app where you can brodcast your location and everyone w
 I created this project just for learning puposes particularly about firebase (firestore db), google maps api and google location api.
 
 ***
+### References
+- [Set Up Google Play Services](https://developers.google.com/android/guides/setup)
+- [Getting Started - Google Maps](https://developers.google.com/maps/documentation/android-api/start)
+- [Get API Key](https://developers.google.com/maps/documentation/android-api/signup)
+- [Add Marker in Maps](https://developers.google.com/maps/documentation/android-api/map-with-marker)
+- Firebase Documentation (Guides) ([Link](https://firebase.google.com/docs/guides/))
+- [Get Started with Firebase Firestore](https://firebase.google.com/docs/firestore/quickstart)
+- [Firestore Data Model](https://firebase.google.com/docs/firestore/data-model)
+- [Firestore - Get Data](https://firebase.google.com/docs/firestore/query-data/get-data)
+- [Firestore - Structure Data](https://firebase.google.com/docs/firestore/manage-data/structure-data)
+
+
+***
 ### Hot to integrate Google Maps & Location API
 To use google maps in an android app you can use `SupportMapFragment` or `MapView`
 
