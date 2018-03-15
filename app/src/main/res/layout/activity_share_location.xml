@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:onClick="onBroadcastBtnClick"
-        android:background="@drawable/bg_btn_start_broadcast"
+        android:background="@drawable/bg_btn_start"
         android:textColor="@android:color/white"
         android:text="@string/start"/>
 
