@@ -24,13 +24,16 @@
         </activity>
         <activity android:name=".locationbroadcast.LocationBroadcastActivity">
         </activity>
+        <activity android:name=".profile.ProfileActivity">
+        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD6AexqhwDiIxOUJbG6UeUP24jQXFYS6so"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".profile.ProfileActivity">
-        </activity>
     </application>
 
 </manifest>
