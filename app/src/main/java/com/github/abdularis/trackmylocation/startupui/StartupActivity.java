@@ -10,8 +10,8 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.github.abdularis.trackmylocation.R;
+import com.github.abdularis.trackmylocation.common.Util;
 import com.github.abdularis.trackmylocation.dashboard.MainActivity;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Arrays;
 
@@ -20,13 +20,16 @@ public class StartupActivity extends AppCompatActivity {
     // request code untuk login
     private static final int RC_LOGIN = 123;
 
-    private FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
-        mAuth = FirebaseAuth.getInstance();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Util.checkGooglePlayServicesAvailability(this);
     }
 
     @Override
