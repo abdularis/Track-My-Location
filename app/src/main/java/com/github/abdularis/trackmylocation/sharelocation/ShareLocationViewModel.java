@@ -1,4 +1,4 @@
-package com.github.abdularis.trackmylocation.locationbroadcast;
+package com.github.abdularis.trackmylocation.sharelocation;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import io.reactivex.Notification;
 import io.reactivex.Observable;
 
-public class LocationBroadcastViewModel extends AndroidViewModel {
+public class ShareLocationViewModel extends AndroidViewModel {
 
     private MyLocationProvider mLocationProvider;
     private MyLocationDataServer mLocationDataServer;
@@ -21,9 +21,9 @@ public class LocationBroadcastViewModel extends AndroidViewModel {
     private Location mLastLocation;
 
     @Inject
-    public LocationBroadcastViewModel(Application application,
-                                      MyLocationProvider locationProvider,
-                                      MyLocationDataServer locationDataServer) {
+    public ShareLocationViewModel(Application application,
+                                  MyLocationProvider locationProvider,
+                                  MyLocationDataServer locationDataServer) {
         super(application);
         mLocationProvider = locationProvider;
         mLocationDataServer = locationDataServer;

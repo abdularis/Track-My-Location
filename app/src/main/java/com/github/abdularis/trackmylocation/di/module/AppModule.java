@@ -6,7 +6,7 @@ import android.content.Context;
 import com.github.abdularis.trackmylocation.ViewModelFactory;
 import com.github.abdularis.trackmylocation.data.MyLocationDataServer;
 import com.github.abdularis.trackmylocation.data.MyLocationProvider;
-import com.github.abdularis.trackmylocation.locationbroadcast.LocationBroadcastViewModel;
+import com.github.abdularis.trackmylocation.sharelocation.ShareLocationViewModel;
 
 import javax.inject.Singleton;
 
@@ -43,16 +43,16 @@ public class AppModule {
 
     @Provides
     @Singleton
-    LocationBroadcastViewModel provideLocationBroadcastViewModel(
+    ShareLocationViewModel provideShareLocationViewModel(
             MyLocationProvider locationProvider, MyLocationDataServer locationDataServer) {
-        return new LocationBroadcastViewModel(mApplication, locationProvider, locationDataServer);
+        return new ShareLocationViewModel(mApplication, locationProvider, locationDataServer);
     }
 
     @Provides
     @Singleton
     ViewModelFactory provideViewModelFactory(
-            LocationBroadcastViewModel locationBroadcastViewModel) {
-        return new ViewModelFactory(locationBroadcastViewModel);
+            ShareLocationViewModel shareLocationViewModel) {
+        return new ViewModelFactory(shareLocationViewModel);
     }
 
 }

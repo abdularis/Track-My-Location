@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".locationbroadcast.LocationBroadcastActivity">
+    tools:context=".sharelocation.ShareLocationActivity">
 
     <include layout="@layout/partial_toolbar"/>
 
@@ -66,6 +66,6 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".locationbroadcast.LocationBroadcastActivity"/>
+        tools:context=".sharelocation.ShareLocationActivity"/>
 
 </LinearLayout>

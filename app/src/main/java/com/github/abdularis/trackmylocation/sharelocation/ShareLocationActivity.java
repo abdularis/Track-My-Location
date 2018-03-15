@@ -1,4 +1,4 @@
-package com.github.abdularis.trackmylocation.locationbroadcast;
+package com.github.abdularis.trackmylocation.sharelocation;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
@@ -34,7 +34,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Notification;
 
-public class LocationBroadcastActivity extends AppCompatActivity
+public class ShareLocationActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private static final float DEFAULT_ZOOM_LEVEL = 12f;
@@ -54,12 +54,12 @@ public class LocationBroadcastActivity extends AppCompatActivity
 
     @Inject
     ViewModelFactory mViewModelFactory;
-    LocationBroadcastViewModel mViewModel;
+    ShareLocationViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_location_broadcast);
+        setContentView(R.layout.activity_share_location);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -69,7 +69,7 @@ public class LocationBroadcastActivity extends AppCompatActivity
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Location Broadcast");
+            actionBar.setTitle("Share Location");
         }
 
         ((App) getApplication()).getAppComponent().inject(this);
@@ -202,7 +202,7 @@ public class LocationBroadcastActivity extends AppCompatActivity
 
     @SuppressLint("CheckResult")
     private void initViewModel() {
-        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(LocationBroadcastViewModel.class);
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(ShareLocationViewModel.class);
         mViewModel.getLocation().subscribe(this::locationUpdate);
         mViewModel.getLocationProviderConnection().subscribe(this::locationProviderConnection);
         mViewModel.getIsBroadcastingObservable().observe(this, this::isBroadcastingChange);

@@ -22,7 +22,7 @@
         </activity>
         <activity android:name=".startupui.StartupActivity">
         </activity>
-        <activity android:name=".locationbroadcast.LocationBroadcastActivity">
+        <activity android:name=".sharelocation.ShareLocationActivity">
         </activity>
         <activity android:name=".profile.ProfileActivity">
         </activity>
