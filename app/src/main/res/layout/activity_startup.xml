@@ -50,6 +50,6 @@
         android:background="@drawable/bg_btn_login"
         android:onClick="onSignInClicked"
         android:textColor="@android:color/white"
-        android:text="Login"/>
+        android:text="@string/login"/>
 
 </LinearLayout>

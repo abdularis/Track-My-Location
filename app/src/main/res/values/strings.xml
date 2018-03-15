@@ -2,4 +2,12 @@
     <string name="app_name">Track My Location</string>
     <string name="app_desc">Track other\'s phone location with simple</string>
     <string name="sign_in_desc">Please sign in or register new account</string>
+    <string name="profile">Profile</string>
+    <string name="track_location">Track Location</string>
+    <string name="share_location">Share Location</string>
+    <string name="start">Start</string>
+    <string name="device_id">Device Id:</string>
+    <string name="lat_long">Lat/Long:</string>
+    <string name="login">Login</string>
+    <string name="stop">Stop</string>
 </resources>

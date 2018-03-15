@@ -69,7 +69,7 @@ public class ShareLocationActivity extends AppCompatActivity
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Share Location");
+            actionBar.setTitle(R.string.share_location);
         }
 
         ((App) getApplication()).getAppComponent().inject(this);
@@ -189,10 +189,10 @@ public class ShareLocationActivity extends AppCompatActivity
     private void isBroadcastingChange(Boolean isBroadcasting) {
         if (isBroadcasting) {
             mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_stop_broadcast));
-            mBtnBroadcast.setText("Stop");
+            mBtnBroadcast.setText(R.string.stop);
         } else {
             mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_start_broadcast));
-            mBtnBroadcast.setText("Share Location");
+            mBtnBroadcast.setText(R.string.start);
         }
     }
 

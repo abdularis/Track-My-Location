@@ -18,7 +18,7 @@
         android:onClick="onBroadcastBtnClick"
         android:background="@drawable/bg_btn_start_broadcast"
         android:textColor="@android:color/white"
-        android:text="Share Location"/>
+        android:text="@string/start"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="8dp"
-                android:text="Device Id:"/>
+                android:text="@string/device_id"/>
             <TextView
                 android:id="@+id/text_dev_id"
                 android:layout_width="wrap_content"
@@ -51,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="8dp"
-                android:text="Lat/Long:"/>
+                android:text="@string/lat_long"/>
             <TextView
                 android:id="@+id/text_curr_latlng"
                 android:layout_width="wrap_content"
