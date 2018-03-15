@@ -188,10 +188,10 @@ public class ShareLocationActivity extends AppCompatActivity
 
     private void isBroadcastingChange(Boolean isBroadcasting) {
         if (isBroadcasting) {
-            mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_stop_broadcast));
+            mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_stop));
             mBtnBroadcast.setText(R.string.stop);
         } else {
-            mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_start_broadcast));
+            mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_start));
             mBtnBroadcast.setText(R.string.start);
         }
     }
