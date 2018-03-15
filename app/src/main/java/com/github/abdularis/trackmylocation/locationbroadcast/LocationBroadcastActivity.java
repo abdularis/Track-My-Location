@@ -3,6 +3,7 @@ package com.github.abdularis.trackmylocation.locationbroadcast;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.github.abdularis.trackmylocation.App;
 import com.github.abdularis.trackmylocation.R;
+import com.github.abdularis.trackmylocation.common.Util;
 import com.github.abdularis.trackmylocation.ViewModelFactory;
 import com.github.abdularis.trackmylocation.data.MyLocationProvider;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -34,11 +37,16 @@ import io.reactivex.Notification;
 public class LocationBroadcastActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
+    private static final float DEFAULT_ZOOM_LEVEL = 12f;
+
     private Marker mMyLocMarker;
     private GoogleMap mGoogleMap;
+    private boolean mFollowMarker;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.text_dev_id)
+    TextView mTextDevId;
     @BindView(R.id.text_curr_latlng)
     TextView mTextLatLng;
     @BindView(R.id.btn_broadcast)
@@ -71,7 +79,10 @@ public class LocationBroadcastActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        mViewModel.connect();
+        if (Util.checkGooglePlayServicesAvailability(this) &&
+                Util.checkLocationPermission(this)) {
+            mViewModel.connect();
+        }
     }
 
     @Override
@@ -81,18 +92,42 @@ public class LocationBroadcastActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mViewModel.isBroadcasting()) mViewModel.switchBroadcast();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
         }
 
-        return onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (Util.checkLocationPermissionsResult(requestCode, permissions, grantResults)) {
+            mViewModel.connect();
+        } else {
+            Toast.makeText(this, "Please grant permission to this app",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        mGoogleMap.setOnMarkerClickListener(marker -> {
+            mFollowMarker = true;
+            return false;
+        });
+        mGoogleMap.setOnMapClickListener(latLng -> mFollowMarker = false);
         if (mViewModel.getLastLocation() != null)
             updateMarker(mViewModel.getLastLocation());
     }
@@ -108,21 +143,39 @@ public class LocationBroadcastActivity extends AppCompatActivity
         LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
         if (mGoogleMap == null) return;
         if (mMyLocMarker == null) {
-            MarkerOptions options = new MarkerOptions()
-                    .title("Me")
-                    .position(pos);
+            MarkerOptions options = new MarkerOptions().title("Me").position(pos);
             mMyLocMarker = mGoogleMap.addMarker(options);
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 12));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, DEFAULT_ZOOM_LEVEL));
         } else {
             mMyLocMarker.setPosition(pos);
+            if (mFollowMarker) {
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(pos));
+            } else if (!isLatLngOnVisibleRegion(pos)) {
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(pos));
+            }
         }
+    }
+
+    private boolean isLatLngOnVisibleRegion(LatLng pos) {
+        LatLngBounds bounds = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
+        return bounds.contains(pos);
     }
 
     private void locationUpdate(Notification<Location> locNotif) {
         if (locNotif.isOnNext()) {
             updateMarker(locNotif.getValue());
         } else if (locNotif.isOnError()) {
-            Toast.makeText(LocationBroadcastActivity.this, "Request location failed", Toast.LENGTH_SHORT).show();
+
+            // jika error-nya merupakan SecurityException itu berarti
+            // permission untuk akses lokasi fine/coarse tidak diizinkan
+            // oleh pengguna
+            if (locNotif.getError() instanceof SecurityException) {
+
+                // check dan minta izin pengguna dan hubungkan kembali
+                // dengan location provider melaui view model di
+                // onRequestPermissionsResult()
+                Util.checkLocationPermission(this);
+            }
         }
     }
 
@@ -136,11 +189,15 @@ public class LocationBroadcastActivity extends AppCompatActivity
     private void isBroadcastingChange(Boolean isBroadcasting) {
         if (isBroadcasting) {
             mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_stop_broadcast));
-            mBtnBroadcast.setText("Stop Broadcasting");
+            mBtnBroadcast.setText("Stop");
         } else {
             mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_start_broadcast));
-            mBtnBroadcast.setText("Start Broadcasting");
+            mBtnBroadcast.setText("Share Location");
         }
+    }
+
+    private void devIdChange(String devId) {
+        mTextDevId.setText(devId);
     }
 
     @SuppressLint("CheckResult")
@@ -148,7 +205,8 @@ public class LocationBroadcastActivity extends AppCompatActivity
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(LocationBroadcastViewModel.class);
         mViewModel.getLocation().subscribe(this::locationUpdate);
         mViewModel.getLocationProviderConnection().subscribe(this::locationProviderConnection);
-        mViewModel.isBroadcasting().observe(this, this::isBroadcastingChange);
+        mViewModel.getIsBroadcastingObservable().observe(this, this::isBroadcastingChange);
+        mViewModel.getDeviceIdObservable().subscribe(this::devIdChange);
     }
 
 

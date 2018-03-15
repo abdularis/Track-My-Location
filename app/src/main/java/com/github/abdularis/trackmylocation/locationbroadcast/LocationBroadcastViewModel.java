@@ -31,9 +31,9 @@ public class LocationBroadcastViewModel extends AndroidViewModel {
     }
 
     public void switchBroadcast() {
-        Boolean broadcasting = mIsBroadcasting.getValue();
-        if (broadcasting != null && broadcasting) {
+        if (isBroadcasting()) {
             mIsBroadcasting.setValue(false);
+            mLocationDataServer.clearCurrentLocation();
         } else {
             mIsBroadcasting.setValue(true);
         }
@@ -56,13 +56,23 @@ public class LocationBroadcastViewModel extends AndroidViewModel {
                 .doOnNext(locationNotification -> {
                     if (locationNotification.isOnNext()) {
                         mLastLocation = locationNotification.getValue();
-                        mLocationDataServer.setCurrentLocation(mLastLocation);
+                        if (isBroadcasting()) {
+                            mLocationDataServer.setCurrentLocation(mLastLocation);
+                        }
                     }
                 });
     }
 
-    public MutableLiveData<Boolean> isBroadcasting() {
+    public MutableLiveData<Boolean> getIsBroadcastingObservable() {
         return mIsBroadcasting;
+    }
+
+    public boolean isBroadcasting() {
+        return mIsBroadcasting.getValue() != null && mIsBroadcasting.getValue();
+    }
+
+    public Observable<String> getDeviceIdObservable() {
+        return mLocationDataServer.getDevIdObservable();
     }
 
     public Location getLastLocation() {

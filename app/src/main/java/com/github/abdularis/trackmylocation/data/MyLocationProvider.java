@@ -80,10 +80,10 @@ public class MyLocationProvider implements GoogleApiClient.ConnectionCallbacks,
             mApiClient.connect();
 
             mLocationRequest = LocationRequest.create();
-            mLocationRequest.setInterval(1500);
-            mLocationRequest.setFastestInterval(2000);
+            mLocationRequest.setInterval(1000);
+            mLocationRequest.setFastestInterval(1000);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        } else {
+        } else if (!mApiClient.isConnected()) {
             mApiClient.connect();
         }
     }
