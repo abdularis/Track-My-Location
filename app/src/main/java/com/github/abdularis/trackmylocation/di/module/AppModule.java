@@ -4,9 +4,10 @@ import android.app.Application;
 import android.content.Context;
 
 import com.github.abdularis.trackmylocation.ViewModelFactory;
+import com.github.abdularis.trackmylocation.data.LocationTrackerDataClient;
 import com.github.abdularis.trackmylocation.data.MyLocationDataServer;
-import com.github.abdularis.trackmylocation.data.MyLocationProvider;
 import com.github.abdularis.trackmylocation.sharelocation.ShareLocationViewModel;
+import com.github.abdularis.trackmylocation.tracklocation.TrackLocationViewModel;
 
 import javax.inject.Singleton;
 
@@ -28,13 +29,6 @@ public class AppModule {
         return mApplication;
     }
 
-
-    @Provides
-    @Singleton
-    MyLocationProvider provideDeviceLocationProvider() {
-        return new MyLocationProvider();
-    }
-
     @Provides
     @Singleton
     MyLocationDataServer provideMyLocationDataServer() {
@@ -43,16 +37,22 @@ public class AppModule {
 
     @Provides
     @Singleton
-    ShareLocationViewModel provideShareLocationViewModel(
-            MyLocationProvider locationProvider, MyLocationDataServer locationDataServer) {
-        return new ShareLocationViewModel(mApplication, locationProvider, locationDataServer);
+    ShareLocationViewModel provideShareLocationViewModel(MyLocationDataServer locationDataServer) {
+        return new ShareLocationViewModel(mApplication, locationDataServer);
+    }
+
+    @Provides
+    @Singleton
+    TrackLocationViewModel provideTrackLocationViewModel() {
+        return new TrackLocationViewModel(new LocationTrackerDataClient());
     }
 
     @Provides
     @Singleton
     ViewModelFactory provideViewModelFactory(
-            ShareLocationViewModel shareLocationViewModel) {
-        return new ViewModelFactory(shareLocationViewModel);
+            ShareLocationViewModel shareLocationViewModel,
+            TrackLocationViewModel trackLocationViewModel) {
+        return new ViewModelFactory(shareLocationViewModel, trackLocationViewModel);
     }
 
 }

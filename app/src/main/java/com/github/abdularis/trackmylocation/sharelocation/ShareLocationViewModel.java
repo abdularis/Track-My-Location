@@ -6,76 +6,64 @@ import android.arch.lifecycle.MutableLiveData;
 import android.location.Location;
 
 import com.github.abdularis.trackmylocation.data.MyLocationDataServer;
-import com.github.abdularis.trackmylocation.data.MyLocationProvider;
+import com.github.abdularis.trackmylocation.data.location.RxLocation;
 
 import javax.inject.Inject;
 
-import io.reactivex.Notification;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 public class ShareLocationViewModel extends AndroidViewModel {
 
-    private MyLocationProvider mLocationProvider;
     private MyLocationDataServer mLocationDataServer;
-    private MutableLiveData<Boolean> mIsBroadcasting;
+    private MutableLiveData<Boolean> mSharingState;
     private Location mLastLocation;
+    private Flowable<Location> mLocationUpdatesObserver;
 
     @Inject
     public ShareLocationViewModel(Application application,
-                                  MyLocationProvider locationProvider,
                                   MyLocationDataServer locationDataServer) {
         super(application);
-        mLocationProvider = locationProvider;
         mLocationDataServer = locationDataServer;
-        mIsBroadcasting = new MutableLiveData<>();
+        mSharingState = new MutableLiveData<>();
     }
 
     public void switchBroadcast() {
-        if (isBroadcasting()) {
-            mIsBroadcasting.setValue(false);
+        if (isSharing()) {
+            mSharingState.setValue(false);
             mLocationDataServer.clearCurrentLocation();
         } else {
-            mIsBroadcasting.setValue(true);
+            mSharingState.setValue(true);
         }
     }
 
-    public void connect() {
-        mLocationProvider.connectService(getApplication());
+    public Flowable<Location> getLocationUpdates() {
+        if (mLocationUpdatesObserver != null) return mLocationUpdatesObserver;
+
+        mLocationUpdatesObserver =
+                RxLocation.getLocationUpdates(getApplication().getApplicationContext(), 1000)
+                        .doOnNext(location -> {
+                            mLastLocation = location;
+                            if (isSharing()) {
+                                mLocationDataServer.setCurrentLocation(mLastLocation);
+                            }
+                        });
+        return mLocationUpdatesObserver;
     }
 
-    public void disconnect() {
-        mLocationProvider.disconnectService();
+    public MutableLiveData<Boolean> getSharingStateLiveData() {
+        return mSharingState;
     }
 
-    public Observable<Integer> getLocationProviderConnection() {
-        return mLocationProvider.getConnectionObservable();
-    }
-
-    public Observable<Notification<Location>> getLocation() {
-        return mLocationProvider.getLocationObservable()
-                .doOnNext(locationNotification -> {
-                    if (locationNotification.isOnNext()) {
-                        mLastLocation = locationNotification.getValue();
-                        if (isBroadcasting()) {
-                            mLocationDataServer.setCurrentLocation(mLastLocation);
-                        }
-                    }
-                });
-    }
-
-    public MutableLiveData<Boolean> getIsBroadcastingObservable() {
-        return mIsBroadcasting;
-    }
-
-    public boolean isBroadcasting() {
-        return mIsBroadcasting.getValue() != null && mIsBroadcasting.getValue();
+    public boolean isSharing() {
+        return mSharingState.getValue() != null && mSharingState.getValue();
     }
 
     public Observable<String> getDeviceIdObservable() {
         return mLocationDataServer.getDevIdObservable();
     }
 
-    public Location getLastLocation() {
+    public Location getLastCachedLocation() {
         return mLastLocation;
     }
 }

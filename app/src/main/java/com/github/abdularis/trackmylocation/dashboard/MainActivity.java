@@ -14,6 +14,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.github.abdularis.trackmylocation.R;
 import com.github.abdularis.trackmylocation.startupui.StartupActivity;
 import com.github.abdularis.trackmylocation.sharelocation.ShareLocationActivity;
+import com.github.abdularis.trackmylocation.tracklocation.TrackLocationActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 import butterknife.BindView;
@@ -81,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onLocTrackClick(View view) {
-        Toast.makeText(this, "Track Location", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(this, TrackLocationActivity.class);
+        startActivity(i);
     }
 
     public void onProfileClick(View view) {

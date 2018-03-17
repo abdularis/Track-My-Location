@@ -18,7 +18,8 @@ import com.github.abdularis.trackmylocation.App;
 import com.github.abdularis.trackmylocation.R;
 import com.github.abdularis.trackmylocation.common.Util;
 import com.github.abdularis.trackmylocation.ViewModelFactory;
-import com.github.abdularis.trackmylocation.data.MyLocationProvider;
+import com.github.abdularis.trackmylocation.data.location.errors.GoogleApiClientConnectionFailed;
+import com.github.abdularis.trackmylocation.data.location.errors.GoogleApiClientConnectionSuspended;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,7 +33,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Notification;
+import io.reactivex.disposables.Disposable;
 
 public class ShareLocationActivity extends AppCompatActivity
         implements OnMapReadyCallback {
@@ -42,6 +43,7 @@ public class ShareLocationActivity extends AppCompatActivity
     private Marker mMyLocMarker;
     private GoogleMap mGoogleMap;
     private boolean mFollowMarker;
+    private Disposable mLocationUpdateDisposable;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -81,20 +83,22 @@ public class ShareLocationActivity extends AppCompatActivity
         super.onStart();
         if (Util.checkGooglePlayServicesAvailability(this) &&
                 Util.checkLocationPermission(this)) {
-            mViewModel.connect();
+            subscribeToLocationUpdate();
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        mViewModel.disconnect();
+    protected void onStop() {
+        super.onStop();
+        mLocationUpdateDisposable.dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mViewModel.isBroadcasting()) mViewModel.switchBroadcast();
+        if (mViewModel.isSharing()) {
+            mViewModel.switchBroadcast();
+        }
     }
 
     @Override
@@ -113,7 +117,7 @@ public class ShareLocationActivity extends AppCompatActivity
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (Util.checkLocationPermissionsResult(requestCode, permissions, grantResults)) {
-            mViewModel.connect();
+            subscribeToLocationUpdate();
         } else {
             Toast.makeText(this, "Please grant permission to this app",
                     Toast.LENGTH_LONG).show();
@@ -128,15 +132,21 @@ public class ShareLocationActivity extends AppCompatActivity
             return false;
         });
         mGoogleMap.setOnMapClickListener(latLng -> mFollowMarker = false);
-        if (mViewModel.getLastLocation() != null)
-            updateMarker(mViewModel.getLastLocation());
+        if (mViewModel.getLastCachedLocation() != null)
+            onLocationUpdated(mViewModel.getLastCachedLocation());
     }
 
     public void onBroadcastBtnClick(View view) {
         mViewModel.switchBroadcast();
     }
 
-    private void updateMarker(Location location) {
+    private void subscribeToLocationUpdate() {
+        if (mLocationUpdateDisposable != null && !mLocationUpdateDisposable.isDisposed()) return;
+        mLocationUpdateDisposable = mViewModel.getLocationUpdates()
+                .subscribe(this::onLocationUpdated, this::onLocationUpdateError);
+    }
+
+    private void onLocationUpdated(Location location) {
         String latlng = location.getLatitude() + "/" + location.getLongitude();
         mTextLatLng.setText(latlng);
 
@@ -157,32 +167,19 @@ public class ShareLocationActivity extends AppCompatActivity
     }
 
     private boolean isLatLngOnVisibleRegion(LatLng pos) {
+        // check apakah pos berada pada posisi yg terlihat dilayar
         LatLngBounds bounds = mGoogleMap.getProjection().getVisibleRegion().latLngBounds;
         return bounds.contains(pos);
     }
 
-    private void locationUpdate(Notification<Location> locNotif) {
-        if (locNotif.isOnNext()) {
-            updateMarker(locNotif.getValue());
-        } else if (locNotif.isOnError()) {
-
-            // jika error-nya merupakan SecurityException itu berarti
-            // permission untuk akses lokasi fine/coarse tidak diizinkan
-            // oleh pengguna
-            if (locNotif.getError() instanceof SecurityException) {
-
-                // check dan minta izin pengguna dan hubungkan kembali
-                // dengan location provider melaui view model di
-                // onRequestPermissionsResult()
-                Util.checkLocationPermission(this);
-            }
-        }
-    }
-
-    private void locationProviderConnection(Integer connCode) {
-        switch (connCode) {
-            case MyLocationProvider.CONNECTION_FAILED:
-                Toast.makeText(this, "Connection failed", Toast.LENGTH_SHORT).show();
+    private void onLocationUpdateError(Throwable t) {
+        if (t instanceof GoogleApiClientConnectionSuspended) {
+            Toast.makeText(ShareLocationActivity.this, "Connection suspended", Toast.LENGTH_SHORT).show();
+        } else if (t instanceof GoogleApiClientConnectionFailed) {
+            Toast.makeText(ShareLocationActivity.this, "Connection failed", Toast.LENGTH_SHORT).show();
+        } else if (t instanceof SecurityException) {
+            // Access to coarse or fine location are not allowed by the user
+            Util.checkLocationPermission(ShareLocationActivity.this);
         }
     }
 
@@ -196,17 +193,11 @@ public class ShareLocationActivity extends AppCompatActivity
         }
     }
 
-    private void devIdChange(String devId) {
-        mTextDevId.setText(devId);
-    }
-
     @SuppressLint("CheckResult")
     private void initViewModel() {
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(ShareLocationViewModel.class);
-        mViewModel.getLocation().subscribe(this::locationUpdate);
-        mViewModel.getLocationProviderConnection().subscribe(this::locationProviderConnection);
-        mViewModel.getIsBroadcastingObservable().observe(this, this::isBroadcastingChange);
-        mViewModel.getDeviceIdObservable().subscribe(this::devIdChange);
+        mViewModel.getSharingStateLiveData().observe(this, this::isBroadcastingChange);
+        mViewModel.getDeviceIdObservable().subscribe(mTextDevId::setText);
     }
 
 
