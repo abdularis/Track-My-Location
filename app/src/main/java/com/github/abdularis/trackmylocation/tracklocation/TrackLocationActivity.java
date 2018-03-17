@@ -13,8 +13,7 @@ import android.widget.Toast;
 import com.github.abdularis.trackmylocation.App;
 import com.github.abdularis.trackmylocation.R;
 import com.github.abdularis.trackmylocation.ViewModelFactory;
-import com.github.abdularis.trackmylocation.model.TrackedLocation;
-import com.github.abdularis.trackmylocation.sharelocation.ShareLocationViewModel;
+import com.github.abdularis.trackmylocation.model.SharedLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -94,11 +93,11 @@ public class TrackLocationActivity extends AppCompatActivity implements OnMapRea
         mViewModel.startTracking(devId);
     }
 
-    private void locationUpdated(TrackedLocation trackedLocation) {
-        LatLng pos = new LatLng(trackedLocation.getLocation().latitude, trackedLocation.getLocation().longitude);
+    private void locationUpdated(SharedLocation sharedLocation) {
+        LatLng pos = new LatLng(sharedLocation.getLocation().latitude, sharedLocation.getLocation().longitude);
         if (mGoogleMap != null && mMyLocMarker == null) {
             MarkerOptions options = new MarkerOptions()
-                    .title(trackedLocation.getDevId())
+                    .title(sharedLocation.getDevId())
                     .position(pos);
             mMyLocMarker = mGoogleMap.addMarker(options);
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 12));

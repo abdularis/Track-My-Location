@@ -1,13 +1,13 @@
 package com.github.abdularis.trackmylocation.model;
 
-public class TrackedLocation {
+public class SharedLocation {
 
     private String mDevId;
     private LatLong mLocation;
     private String mName;
     private String mPhotoUrl;
 
-    public TrackedLocation() {
+    public SharedLocation() {
         mDevId = "";
         mLocation = new LatLong();
         mName = "";

@@ -1,10 +1,9 @@
 package com.github.abdularis.trackmylocation.tracklocation;
 
 import android.arch.lifecycle.ViewModel;
-import android.location.Location;
 
 import com.github.abdularis.trackmylocation.data.LocationTrackerDataClient;
-import com.github.abdularis.trackmylocation.model.TrackedLocation;
+import com.github.abdularis.trackmylocation.model.SharedLocation;
 
 import javax.inject.Inject;
 
@@ -27,7 +26,7 @@ public class TrackLocationViewModel extends ViewModel {
         mLocationTracker.stopTracking();
     }
 
-    public Observable<TrackedLocation> getTrackedLocationUpdate() {
+    public Observable<SharedLocation> getTrackedLocationUpdate() {
         return mLocationTracker.getLocationUpdate();
     }
 

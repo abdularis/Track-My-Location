@@ -3,7 +3,7 @@ package com.github.abdularis.trackmylocation.data;
 import android.location.Location;
 import android.util.Log;
 
-import com.github.abdularis.trackmylocation.model.TrackedLocation;
+import com.github.abdularis.trackmylocation.model.SharedLocation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -21,7 +21,7 @@ public class MyLocationDataServer {
     private BehaviorSubject<String> mDevIdSubject;
     private FirebaseUser user;
     private DocumentReference mDocRef;
-    private TrackedLocation trackedLocation;
+    private SharedLocation mSharedLocation;
 
     public MyLocationDataServer() {
         mDevIdSubject = BehaviorSubject.create();
@@ -35,11 +35,11 @@ public class MyLocationDataServer {
     public void setCurrentLocation(Location location) {
         if (mInitialized) {
 
-            trackedLocation.setLocation(new TrackedLocation.LatLong(location.getLatitude(), location.getLongitude()));
-            if (user.getDisplayName() != null) trackedLocation.setName(user.getDisplayName());
-            if (user.getPhotoUrl() != null) trackedLocation.setPhotoUrl(user.getPhotoUrl().toString());
+            mSharedLocation.setLocation(new SharedLocation.LatLong(location.getLatitude(), location.getLongitude()));
+            if (user.getDisplayName() != null) mSharedLocation.setName(user.getDisplayName());
+            if (user.getPhotoUrl() != null) mSharedLocation.setPhotoUrl(user.getPhotoUrl().toString());
 
-            mDocRef.set(trackedLocation);
+            mDocRef.set(mSharedLocation);
         } else {
             init();
         }
@@ -59,7 +59,7 @@ public class MyLocationDataServer {
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
-        trackedLocation = new TrackedLocation();
+        mSharedLocation = new SharedLocation();
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         firestore.collection("users")
                 .document(user.getUid())
@@ -85,7 +85,7 @@ public class MyLocationDataServer {
                                 mDocRef = FirebaseFirestore.getInstance()
                                         .collection("shared_locations")
                                         .document(mDevId);
-                                trackedLocation.setDevId(mDevId);
+                                mSharedLocation.setDevId(mDevId);
                             }
                         }
                     }

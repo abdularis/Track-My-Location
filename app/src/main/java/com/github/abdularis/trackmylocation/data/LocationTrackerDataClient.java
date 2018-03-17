@@ -2,12 +2,8 @@ package com.github.abdularis.trackmylocation.data;
 
 import android.util.Log;
 
-import com.github.abdularis.trackmylocation.model.TrackedLocation;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
+import com.github.abdularis.trackmylocation.model.SharedLocation;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import io.reactivex.Observable;
@@ -15,7 +11,7 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class LocationTrackerDataClient {
 
-    private BehaviorSubject<TrackedLocation> mTrackedLocationSubject;
+    private BehaviorSubject<SharedLocation> mTrackedLocationSubject;
     private ListenerRegistration registration;
 
     public LocationTrackerDataClient() {
@@ -28,8 +24,8 @@ public class LocationTrackerDataClient {
                 .document(devId)
                 .addSnapshotListener((documentSnapshot, e) -> {
                     if (documentSnapshot.exists()) {
-                        TrackedLocation trackedLocation = documentSnapshot.toObject(TrackedLocation.class);
-                        mTrackedLocationSubject.onNext(trackedLocation);
+                        SharedLocation sharedLocation = documentSnapshot.toObject(SharedLocation.class);
+                        mTrackedLocationSubject.onNext(sharedLocation);
                         Log.v("Tracker", "doc exists");
                     }
 
@@ -43,7 +39,7 @@ public class LocationTrackerDataClient {
         }
     }
 
-    public Observable<TrackedLocation> getLocationUpdate() {
+    public Observable<SharedLocation> getLocationUpdate() {
         return mTrackedLocationSubject;
     }
 }
