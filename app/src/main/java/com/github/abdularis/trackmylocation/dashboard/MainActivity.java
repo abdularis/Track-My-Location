@@ -76,17 +76,17 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    public void onLocBroadcastClick(View view) {
+    public void onShareLocClick(View view) {
         Intent i = new Intent(this, ShareLocationActivity.class);
         startActivity(i);
     }
 
-    public void onLocTrackClick(View view) {
+    public void onTrackLocClick(View view) {
         Intent i = new Intent(this, TrackLocationActivity.class);
         startActivity(i);
     }
 
     public void onProfileClick(View view) {
-        Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "TODO: Implement this", Toast.LENGTH_SHORT).show();
     }
 }
