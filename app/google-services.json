@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1045868149854",
+    "firebase_url": "https://track-my-location-6d39f.firebaseio.com",
+    "project_id": "track-my-location-6d39f",
+    "storage_bucket": "track-my-location-6d39f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1045868149854:android:41656a612353c689",
+        "android_client_info": {
+          "package_name": "com.github.abdularis.trackmylocation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1045868149854-n59pd4984p4lf7c0skik9j87kk3pn999.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.abdularis.trackmylocation",
+            "certificate_hash": "ca7a81d67dce2743e9bff704af2f2460912b9019"
+          }
+        },
+        {
+          "client_id": "1045868149854-7hhrrq16fsbm22d961m9r5apr268676g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtr1afx2l0kHJ1gH6gLU86-4sgz6_WsyU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1045868149854-7hhrrq16fsbm22d961m9r5apr268676g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

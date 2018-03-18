@@ -3,6 +3,8 @@ This is a simple android app where you can brodcast your location and everyone w
 
 I created this project just for learning puposes particularly about firebase (firestore db), google maps api and google location api.
 
+- [Backend (Firebase Cloud Functions)](https://github.com/abdularis/Track-My-Location_Cloud-Functions)
+
 ***
 ### References
 - [Set Up Google Play Services](https://developers.google.com/android/guides/setup)
