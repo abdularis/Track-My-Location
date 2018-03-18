@@ -15,6 +15,14 @@ I created this project just for learning puposes particularly about firebase (fi
 - [Firestore - Get Data](https://firebase.google.com/docs/firestore/query-data/get-data)
 - [Firestore - Structure Data](https://firebase.google.com/docs/firestore/manage-data/structure-data)
 
+***
+### How it works?
+![](images/hiw.png)
+
+- The first device get continous location update from gps, network etc. then
+- Write and update the location data to a specific firebase firestore document
+- Last, the second device read that firebase firestore document and show the marker in that location
+
 
 ***
 ### Hot to integrate Google Maps & Location API
