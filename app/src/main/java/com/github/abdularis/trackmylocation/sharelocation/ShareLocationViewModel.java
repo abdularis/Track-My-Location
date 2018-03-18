@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.location.Location;
 
-import com.github.abdularis.trackmylocation.data.MyLocationDataServer;
+import com.github.abdularis.trackmylocation.data.DeviceLocationDataStore;
 import com.github.abdularis.trackmylocation.data.location.RxLocation;
 
 import javax.inject.Inject;
@@ -15,25 +15,28 @@ import io.reactivex.Observable;
 
 public class ShareLocationViewModel extends AndroidViewModel {
 
-    private MyLocationDataServer mLocationDataServer;
     private MutableLiveData<Boolean> mSharingState;
     private Location mLastLocation;
     private Flowable<Location> mLocationUpdatesObserver;
+    private DeviceLocationDataStore mDeviceLocationDataStore;
 
     @Inject
     public ShareLocationViewModel(Application application,
-                                  MyLocationDataServer locationDataServer) {
+                                  DeviceLocationDataStore deviceLocationDataStore) {
         super(application);
-        mLocationDataServer = locationDataServer;
+        mDeviceLocationDataStore = deviceLocationDataStore;
         mSharingState = new MutableLiveData<>();
     }
 
-    public void switchBroadcast() {
+    public void startSharingLocation() {
+        mSharingState.setValue(true);
+        mDeviceLocationDataStore.shareMyLocation(getLocationUpdates());
+    }
+
+    public void stopSharingLocation() {
         if (isSharing()) {
             mSharingState.setValue(false);
-            mLocationDataServer.clearCurrentLocation();
-        } else {
-            mSharingState.setValue(true);
+            mDeviceLocationDataStore.stopShareMyLocation().subscribe();
         }
     }
 
@@ -44,9 +47,6 @@ public class ShareLocationViewModel extends AndroidViewModel {
                 RxLocation.getLocationUpdates(getApplication().getApplicationContext(), 1000)
                         .doOnNext(location -> {
                             mLastLocation = location;
-                            if (isSharing()) {
-                                mLocationDataServer.setCurrentLocation(mLastLocation);
-                            }
                         });
         return mLocationUpdatesObserver;
     }
@@ -60,7 +60,7 @@ public class ShareLocationViewModel extends AndroidViewModel {
     }
 
     public Observable<String> getDeviceIdObservable() {
-        return mLocationDataServer.getDevIdObservable();
+        return mDeviceLocationDataStore.getDeviceId();
     }
 
     public Location getLastCachedLocation() {

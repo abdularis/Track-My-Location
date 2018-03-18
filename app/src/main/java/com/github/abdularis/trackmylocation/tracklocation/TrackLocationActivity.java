@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.abdularis.trackmylocation.App;
 import com.github.abdularis.trackmylocation.R;
 import com.github.abdularis.trackmylocation.ViewModelFactory;
+import com.github.abdularis.trackmylocation.data.rxfirestore.errors.DocumentNotExistsException;
 import com.github.abdularis.trackmylocation.model.SharedLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,6 +39,10 @@ public class TrackLocationActivity extends AppCompatActivity implements OnMapRea
     Toolbar mToolbar;
     @BindView(R.id.text_dev_id)
     EditText mTextDevId;
+    @BindView(R.id.btn_track)
+    Button mBtnTrack;
+    @BindView(R.id.text_loc_stat)
+    TextView mTextLocStat;
 
     @Inject
     ViewModelFactory mViewModelFactory;
@@ -83,6 +90,11 @@ public class TrackLocationActivity extends AppCompatActivity implements OnMapRea
     }
 
     public void onStartTrackClick(View view) {
+        if (mViewModel.isTracking()) {
+            mViewModel.stopTracking();
+            return;
+        }
+
         String devId = mTextDevId.getText().toString();
         if (devId.isEmpty()) {
             Toast.makeText(this, "Please insert valid Device Id", Toast.LENGTH_SHORT).show();
@@ -90,7 +102,12 @@ public class TrackLocationActivity extends AppCompatActivity implements OnMapRea
         }
 
         Toast.makeText(this, "Start tracking...", Toast.LENGTH_SHORT).show();
-        mViewModel.startTracking(devId);
+        mViewModel.getLocationUpdate(devId)
+                .subscribe(this::locationUpdated, throwable -> {
+                    if (throwable instanceof DocumentNotExistsException) {
+                        Toast.makeText(TrackLocationActivity.this, "Data not found/Disconnected", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void locationUpdated(SharedLocation sharedLocation) {
@@ -101,17 +118,29 @@ public class TrackLocationActivity extends AppCompatActivity implements OnMapRea
                     .position(pos);
             mMyLocMarker = mGoogleMap.addMarker(options);
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 12));
-        }
-
-        if (mMyLocMarker != null) {
+        } else if (mMyLocMarker != null) {
             mMyLocMarker.setPosition(pos);
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(pos));
         }
+
+        mTextLocStat.setText(pos.toString());
     }
 
     private void initViewModel() {
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(TrackLocationViewModel.class);
-        mViewModel.getTrackedLocationUpdate().subscribe(this::locationUpdated);
+        mViewModel.getTrackingState().observe(this, tracking -> {
+            if (tracking != null && tracking) {
+                mTextDevId.setEnabled(false);
+                mBtnTrack.setBackground(getResources().getDrawable(R.drawable.bg_btn_stop));
+                mBtnTrack.setText(R.string.stop);
+                mTextLocStat.setText(R.string.fetching);
+            } else {
+                mTextDevId.setEnabled(true);
+                mBtnTrack.setBackground(getResources().getDrawable(R.drawable.bg_btn_start));
+                mBtnTrack.setText(R.string.start);
+                mTextLocStat.setText(R.string.disconnected);
+            }
+        });
     }
 
 

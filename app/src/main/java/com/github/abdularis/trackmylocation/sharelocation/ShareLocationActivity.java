@@ -96,9 +96,7 @@ public class ShareLocationActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mViewModel.isSharing()) {
-            mViewModel.switchBroadcast();
-        }
+        mViewModel.stopSharingLocation();
     }
 
     @Override
@@ -137,7 +135,11 @@ public class ShareLocationActivity extends AppCompatActivity
     }
 
     public void onBroadcastBtnClick(View view) {
-        mViewModel.switchBroadcast();
+        if (mViewModel.isSharing()) {
+            mViewModel.stopSharingLocation();
+        } else {
+            mViewModel.startSharingLocation();
+        }
     }
 
     private void subscribeToLocationUpdate() {
@@ -183,7 +185,7 @@ public class ShareLocationActivity extends AppCompatActivity
         }
     }
 
-    private void isBroadcastingChange(Boolean isBroadcasting) {
+    private void sharingStateChange(Boolean isBroadcasting) {
         if (isBroadcasting) {
             mBtnBroadcast.setBackground(getResources().getDrawable(R.drawable.bg_btn_stop));
             mBtnBroadcast.setText(R.string.stop);
@@ -196,7 +198,7 @@ public class ShareLocationActivity extends AppCompatActivity
     @SuppressLint("CheckResult")
     private void initViewModel() {
         mViewModel = ViewModelProviders.of(this, mViewModelFactory).get(ShareLocationViewModel.class);
-        mViewModel.getSharingStateLiveData().observe(this, this::isBroadcastingChange);
+        mViewModel.getSharingStateLiveData().observe(this, this::sharingStateChange);
         mViewModel.getDeviceIdObservable().subscribe(mTextDevId::setText);
     }
 

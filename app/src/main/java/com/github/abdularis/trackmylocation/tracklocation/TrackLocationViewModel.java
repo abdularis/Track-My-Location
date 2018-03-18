@@ -1,33 +1,57 @@
 package com.github.abdularis.trackmylocation.tracklocation;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.github.abdularis.trackmylocation.data.LocationTrackerDataClient;
+import com.github.abdularis.trackmylocation.data.DeviceLocationDataStore;
 import com.github.abdularis.trackmylocation.model.SharedLocation;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class TrackLocationViewModel extends ViewModel {
 
-    private LocationTrackerDataClient mLocationTracker;
+    private DeviceLocationDataStore mDeviceLocationDataStore;
+    private MutableLiveData<Boolean> mTrackingState;
+    private CompositeDisposable mCompositeDisposable;
 
     @Inject
-    public TrackLocationViewModel(LocationTrackerDataClient locationTracker) {
-        mLocationTracker = locationTracker;
-    }
-
-    public void startTracking(String devId) {
-        mLocationTracker.startTracking(devId);
+    public TrackLocationViewModel(DeviceLocationDataStore deviceLocationDataStore) {
+        mDeviceLocationDataStore = deviceLocationDataStore;
+        mTrackingState = new MutableLiveData<>();
+        mCompositeDisposable = new CompositeDisposable();
     }
 
     public void stopTracking() {
-        mLocationTracker.stopTracking();
+        if (isTracking()) {
+            mTrackingState.setValue(false);
+            mCompositeDisposable.dispose();
+            mCompositeDisposable = new CompositeDisposable();
+        }
     }
 
-    public Observable<SharedLocation> getTrackedLocationUpdate() {
-        return mLocationTracker.getLocationUpdate();
+    public Observable<SharedLocation> getLocationUpdate(String devId) {
+        return mDeviceLocationDataStore.getSharedLocationUpdate(devId)
+                .doOnSubscribe(disposable -> {
+                    mCompositeDisposable.add(disposable);
+                    if (!isTracking()) {
+                        mTrackingState.setValue(true);
+                    }
+                })
+                .doOnError(throwable -> {
+                    if (isTracking()) {
+                        stopTracking();
+                    }
+                });
     }
 
+    public MutableLiveData<Boolean> getTrackingState() {
+        return mTrackingState;
+    }
+
+    public boolean isTracking() {
+        return mTrackingState.getValue() != null && mTrackingState.getValue();
+    }
 }
