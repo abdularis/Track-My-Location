@@ -11,9 +11,13 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            resValue 'string', 'google_maps_api_key', TrackMyLocation_GoogleMapsAPIKey
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            resValue 'string', 'google_maps_api_key', TrackMyLocation_GoogleMapsAPIKey
         }
     }
     compileOptions {
