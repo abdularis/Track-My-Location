@@ -21,9 +21,11 @@ public abstract class GoogleApiClientFlowableOnSubscribe<T> implements FlowableO
 
     private final Context mContext;
     private GoogleApiClient googleApiClient;
+    private int googleApiClientUsageCount;
 
     public GoogleApiClientFlowableOnSubscribe(Context context) {
         mContext = context.getApplicationContext();
+        googleApiClientUsageCount = 0;
     }
 
     @Override
@@ -37,12 +39,13 @@ public abstract class GoogleApiClientFlowableOnSubscribe<T> implements FlowableO
 
             if (!googleApiClient.isConnected()) {
                 googleApiClient.connect();
-                Log.i(TAG, "Google api client reconnecting...");
+                Log.d(TAG, "Subscribe:Reconnect google api client");
+            } else {
+                Log.d(TAG, "Subscribe:Reuse google api client");
             }
 
-
         } else {
-            Log.i(TAG, "Creating new google api client instance");
+            Log.d(TAG, "Subscribe:Create new google api client instance");
 
             googleApiClient = new GoogleApiClient.Builder(mContext)
                     .addConnectionCallbacks(apiClientCallback)
@@ -52,20 +55,25 @@ public abstract class GoogleApiClientFlowableOnSubscribe<T> implements FlowableO
             googleApiClient.connect();
         }
 
+        googleApiClientUsageCount++;
         e.setCancellable(() -> {
             if (googleApiClient != null && googleApiClient.isConnected()) {
-                onUnsubscribe(googleApiClient);
+                onEmitterUnsubscribe(googleApiClient, apiClientCallback.emitter);
                 googleApiClient.unregisterConnectionCallbacks(apiClientCallback);
                 googleApiClient.unregisterConnectionFailedListener(apiClientCallback);
-                googleApiClient.disconnect();
                 apiClientCallback.emitter = null;
+                googleApiClientUsageCount--;
+                if (googleApiClientUsageCount <= 0) {
+                    Log.d(TAG, "Disconnect google api client, cause no one using it");
+                    googleApiClient.disconnect();
+                }
             }
         });
     }
 
     protected abstract void onGoogleApiClientReady(GoogleApiClient apiClient, FlowableEmitter<T> e);
 
-    protected abstract void onUnsubscribe(GoogleApiClient apiClient);
+    protected abstract void onEmitterUnsubscribe(GoogleApiClient apiClient, FlowableEmitter<T> e);
 
     protected class GoogleApiClientConnectionCallback
             implements GoogleApiClient.ConnectionCallbacks,
