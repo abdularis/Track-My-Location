@@ -5,8 +5,8 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.location.Location;
 
+import com.github.abdularis.rxlocation.RxLocation;
 import com.github.abdularis.trackmylocation.data.DeviceLocationDataStore;
-import com.github.abdularis.trackmylocation.data.location.RxLocation;
 
 import javax.inject.Inject;
 

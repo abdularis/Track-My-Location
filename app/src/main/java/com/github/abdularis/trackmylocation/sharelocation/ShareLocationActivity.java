@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -18,8 +19,6 @@ import com.github.abdularis.trackmylocation.App;
 import com.github.abdularis.trackmylocation.R;
 import com.github.abdularis.trackmylocation.common.Util;
 import com.github.abdularis.trackmylocation.ViewModelFactory;
-import com.github.abdularis.trackmylocation.data.location.errors.GoogleApiClientConnectionFailed;
-import com.github.abdularis.trackmylocation.data.location.errors.GoogleApiClientConnectionSuspended;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,6 +38,7 @@ public class ShareLocationActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     private static final float DEFAULT_ZOOM_LEVEL = 12f;
+    private static final String TAG = "ShareLocationActivity";
 
     private Marker mMyLocMarker;
     private GoogleMap mGoogleMap;
@@ -175,14 +175,11 @@ public class ShareLocationActivity extends AppCompatActivity
     }
 
     private void onLocationUpdateError(Throwable t) {
-        if (t instanceof GoogleApiClientConnectionSuspended) {
-            Toast.makeText(ShareLocationActivity.this, "Connection suspended", Toast.LENGTH_SHORT).show();
-        } else if (t instanceof GoogleApiClientConnectionFailed) {
-            Toast.makeText(ShareLocationActivity.this, "Connection failed", Toast.LENGTH_SHORT).show();
-        } else if (t instanceof SecurityException) {
+        if (t instanceof SecurityException) {
             // Access to coarse or fine location are not allowed by the user
             Util.checkLocationPermission(ShareLocationActivity.this);
         }
+        Log.d(TAG, "LocationUpdateErr: " + t.toString());
     }
 
     private void sharingStateChange(Boolean isBroadcasting) {
