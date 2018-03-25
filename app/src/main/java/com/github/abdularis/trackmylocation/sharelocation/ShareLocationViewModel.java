@@ -43,11 +43,12 @@ public class ShareLocationViewModel extends AndroidViewModel {
     public Flowable<Location> getLocationUpdates() {
         if (mLocationUpdatesObserver != null) return mLocationUpdatesObserver;
 
-        mLocationUpdatesObserver =
-                RxLocation.getLocationUpdates(getApplication().getApplicationContext(), 1000)
-                        .doOnNext(location -> {
-                            mLastLocation = location;
-                        });
+        mLocationUpdatesObserver = RxLocation.getLocationUpdatesBuilder(getApplication().getApplicationContext())
+                .setInterval(1000)
+                .build()
+                .doOnNext(location -> {
+                    mLastLocation = location;
+                });
         return mLocationUpdatesObserver;
     }
 
